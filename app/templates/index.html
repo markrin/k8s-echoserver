@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Echo server</title>
+  </head>
+  <body>
+    <form action="/" method="POST">
+      <input type="text" name="string" placeholder="Enter any string" />
+      <button type="submit">Submit</button>
+       <p>Echo string: {{ message }}</p>
+       <p>Client location: {{ location }}</p>
+       <p>Server IP: {{ server_ip }}</p>
+       <p>Env: {{ env }}</p>
+    </form>
+  </body>
+</html>
