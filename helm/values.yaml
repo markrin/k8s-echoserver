@@ -1,0 +1,12 @@
+
+app_name: pyecho
+
+pyecho_service_name: pyecho_service
+
+service:
+  type: ClusterIP
+  port: 80
+
+app_port: 5000
+
+replicaCount: 1

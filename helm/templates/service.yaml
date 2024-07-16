@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.pyecho_service_name }}
+  labels:
+    - {{ .Values.labels }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.app_port }}
+      protocol: TCP
+      name: http
+  selector:
+    - {{ .Values.app_name }}

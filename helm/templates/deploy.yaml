@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  {{  .Values.app_name }}
+  namespace: default
+  labels:
+    app:  {{  .Values.app_name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{  .Values.app_name }}
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 50%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app:  {{  .Values.app_name }}
+    spec:
+      containers:
+      - name:  {{  .Values.app_name }}
+        image:  pyecho:1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          tcpSocket:
+            port: 5000
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{  .Values.app_name }}
+              key: DB_HOST
+        ports:
+        - containerPort:  5000
+          name:  {{  .Values.app_name }}
+      restartPolicy: Always
