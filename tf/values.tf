@@ -15,3 +15,10 @@ locals {
     }
 }
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+locals {
+  az_list = data.aws_availability_zones.available.names
+}
