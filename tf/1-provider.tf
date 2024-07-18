@@ -1,10 +1,18 @@
 provider "aws" {
-  alias = "region"
+  # alias = "region"
+  default_tags {
+    tags = {
+        Name = "Mark"
+        Owner = "Nati"
+        Department = "DevOps"
+        Temp = "True"
+    }
+  }
 }
 
-data "aws_region" "current" {
-  provider = aws.region
-}
+# data "aws_region" "current" {
+#   provider = aws.region
+# }
 
 terraform {
   required_providers {
@@ -13,6 +21,7 @@ terraform {
       version = "~> 3.0"
     }
   }
+  required_version = ">= 1.2"
   # COMMENT BEFORE FIRST APPLY AND UNCOMMENT AFTER
   backend "s3" {
     bucket         = "markr-test-assignment-tf-state"
@@ -25,7 +34,6 @@ terraform {
 resource "aws_s3_bucket" "terraform_state" {
   bucket        = "markr-test-assignment-tf-state"
   force_destroy = true
-  tags = local.common_tags
 }
 
 resource "aws_s3_bucket_versioning" "terraform_bucket_versioning" {
@@ -52,5 +60,4 @@ resource "aws_dynamodb_table" "terraform_locks" {
     name = "LockID"
     type = "S"
   }
-  tags = local.common_tags
 }
