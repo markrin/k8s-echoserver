@@ -6,7 +6,7 @@ metadata:
   name: ingress
   namespace: default
   annotations:
-    # service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-type: alb
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
@@ -21,7 +21,7 @@ spec:
   - http:
       paths:
       - path: /
-        pathType: Prefix
+        pathType: Exact
         backend:
           service:
             name: {{ .Values.pyecho_service_name }}

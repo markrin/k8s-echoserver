@@ -8,12 +8,14 @@ resource "aws_subnet" "private-az1" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = local.az_list[0]
+  tags = { "kubernetes.io/role/internal-elb" = "1" }
 }
 
 resource "aws_subnet" "private-az2" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = "10.0.2.0/24"
   availability_zone = local.az_list[1]
+  tags = { "kubernetes.io/role/internal-elb" = "1" }
 }
 
 resource "aws_subnet" "public-az1" {
@@ -311,7 +313,7 @@ resource "helm_release" "pyecho" {
   repository = "oci://${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.id}.amazonaws.com"
   chart      = "mark-pyecho"
   namespace  = "default"
-  version    = "0.0.11"
+  version    = "0.0.12"
   # 0.0.1 - nlb
   set {
     name  = "env"
@@ -331,12 +333,12 @@ resource "helm_release" "pyecho" {
   depends_on = [aws_eks_node_group.private-nodes]
 }
 
-data "kubernetes_service" "ingress" {
-  metadata {
-    name      = "ingress"
-    namespace = helm_release.pyecho.namespace
-  }
-}
+# data "kubernetes_service" "ingress" {
+#   metadata {
+#     name      = "ingress"
+#     namespace = helm_release.pyecho.namespace
+#   }
+# }
 
 # ? IAM service role binding
 # helm deploy
