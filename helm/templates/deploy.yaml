@@ -22,7 +22,9 @@ spec:
     spec:
       containers:
       - name:  {{  .Values.app_name }}
-        image:  pyecho:1
+        image:  "{{ .Values.account_id }}.dkr.ecr.{{ .Values.region }}.amazonaws.com/{{ .Values.image_name }}:{{ .Values.image_version }}"
+        args:
+        - "--env={{ .Values.env }}"
         resources:
           requests:
             cpu: 100m
@@ -48,11 +50,8 @@ spec:
           failureThreshold: 3
           periodSeconds: 10
         env:
-        - name: DB_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: {{  .Values.app_name }}
-              key: DB_HOST
+        - name: TEST
+          value: test
         ports:
         - containerPort:  5000
           name:  {{  .Values.app_name }}

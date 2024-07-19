@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 RUN apt-get update && \
-    apt-get install -y gnupg software-properties-common wget curl vim
+    apt-get install -y gnupg software-properties-common wget curl vim jq unzip
 
 RUN wget -O- https://apt.releases.hashicorp.com/gpg | \
     gpg --dearmor | \
@@ -15,7 +15,9 @@ RUN wget -O- https://apt.releases.hashicorp.com/gpg | \
 
 RUN apt update && apt-get install -y terraform
 
-RUN echo "alias tf=terraform" >> ~/.bashrc && . ~/.bashrc
+RUN echo "alias tf=terraform" >> ~/.bashrc &&\
+    echo "export AWS_DEFAULT_REGION=eu-central-1" >> ~/.bashrc &&\
+    . ~/.bashrc
 
 WORKDIR /home/tf
 

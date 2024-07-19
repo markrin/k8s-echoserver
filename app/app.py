@@ -5,6 +5,8 @@ from flask import Flask, render_template, request
 import socket
 global env
 import requests
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -24,7 +26,18 @@ def health():
 @app.route('/', methods=['POST'])
 def echo():
     ip = socket.gethostbyname(socket.gethostname())
-    client_ip = request.remote_addr  # '54.48.0.1'
+    headers = {key: value for key, value in request.headers}
+    app.logger.debug("Request Headers:")
+    for key, value in headers.items():
+        app.logger.debug(f"{key}: {value}")
+    app.logger.debug(f"access_route: {request.access_route}")
+    x_forwarded_for = request.headers.get('X-Forwarded-For', None)
+    if x_forwarded_for:
+        client_ip = x_forwarded_for.split(',')[0]
+        app.logger.debug("x-forwarde-for found")
+    else:
+        client_ip = request.remote_addr
+        app.logger.debug("NO x-forwarde-for")
     string = request.form['string']
     location = requests.get(f'http://ip-api.com/json/{client_ip}', stream=True)
     location = json.loads(location.text)
@@ -35,7 +48,7 @@ def echo():
                         message=string,
                         server_ip=ip,  # request.server[0],
                         env=env,
-                        location=location_string #request.headers.get('x-forwarded-for', 'none'))
+                        location=location_string
     )
 
 

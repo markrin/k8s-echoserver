@@ -184,6 +184,11 @@ resource "aws_iam_role_policy_attachment" "policy-attachment-AmazonEKSClusterPol
   role       = aws_iam_role.eks_master_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "policy-attachment-ecr-readonly" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.eks_master_role.name
+}
+
 
 resource "aws_eks_cluster" "cluster" {
   name     = var.cluster_name
@@ -274,9 +279,65 @@ resource "aws_eks_node_group" "private-nodes" {
   ]
 }
 
+data "aws_eks_cluster_auth" "this" {
+  name = aws_eks_cluster.cluster.id
+}
 
-# ECR registry (and access policy) +-
-# EKS (oidc, cert) +
-# node pool +
-# IAM service role binding
+data "aws_ecr_authorization_token" "token" {
+  registry_id = aws_ecr_repository.repo.registry_id
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = aws_eks_cluster.cluster.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.cluster.certificate_authority[0].data)
+    # token = data.aws_eks_cluster_auth.this.token
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", aws_eks_cluster.cluster.id]
+      command     = "aws"
+    }
+  }
+  registry {
+    url = "oci://${aws_ecr_repository.repo.repository_url}"
+    username = data.aws_ecr_authorization_token.token.user_name
+    password = data.aws_ecr_authorization_token.token.password
+  }
+}
+
+resource "helm_release" "pyecho" {
+  name = "pyecho"
+
+  repository = "oci://${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.id}.amazonaws.com"
+  chart      = "mark-pyecho"
+  namespace  = "default"
+  version    = "0.0.11"
+  # 0.0.1 - nlb
+  set {
+    name  = "env"
+    value = var.env
+  }
+
+  set {
+    name = "account_id"
+    value = data.aws_caller_identity.current.account_id
+  }
+
+  set {
+    name = "region"
+    value = data.aws_region.current.id
+  }
+
+  depends_on = [aws_eks_node_group.private-nodes]
+}
+
+data "kubernetes_service" "ingress" {
+  metadata {
+    name      = "ingress"
+    namespace = helm_release.pyecho.namespace
+  }
+}
+
+# ? IAM service role binding
 # helm deploy
+# ? role for Ingress controller

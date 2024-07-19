@@ -1,9 +1,9 @@
 
-# vars.region set automatically by provider
+data "aws_region" "current" {}
 
 variable "env" {
   type        = string
-  default     = "internal"
+  default     = "int"
   nullable = false
 }
 
