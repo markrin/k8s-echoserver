@@ -10,3 +10,7 @@ output "vpc_id" {
 # output "alb_address" {
 #   helm_release.pyecho.
 # }
+
+# output "test" {
+#   value = data.kubernetes_service.ingress.metadata
+# }
