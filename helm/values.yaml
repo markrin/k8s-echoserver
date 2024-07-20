@@ -5,13 +5,13 @@ region: eu-east-1
 
 account_id: 000000000000
 
-app_name: pyecho
+app_name: mark-pyecho
 
-image_version: 4
+image_version: 5
 
 image_name: mark-pyecho
 
-pyecho_service_name: pyecho-service 
+pyecho_service_name: pyecho-service
 
 service:
   type: ClusterIP
@@ -20,3 +20,5 @@ service:
 app_port: 5000
 
 replicaCount: 1
+
+ingress_sg: sg-xxxxxx

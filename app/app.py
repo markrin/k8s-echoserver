@@ -6,7 +6,7 @@ import socket
 global env
 import requests
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO) # DEBUG
 
 def parse_args():
     parser = argparse.ArgumentParser()

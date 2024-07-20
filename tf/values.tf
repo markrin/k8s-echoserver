@@ -12,14 +12,19 @@ variable "cluster_name" {
   default = "mark-assignment"
 }
 
-variable "ecr_repo_name" {
+variable "app_name" {
   type = string
   default = "mark-pyecho"
 }
 
 variable "workers_instance_type" {
   type = string
-  default = "t3.small"
+  default = "t3.medium"
+}
+
+variable "helm_release_version" {
+  type = string
+  default = "0.0.22"
 }
 
 locals {

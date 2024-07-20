@@ -3,7 +3,6 @@ kind: Service
 metadata:
   name: {{ .Values.pyecho_service_name }}
 spec:
-  type: LoadBalancer
   selector:
     app: {{ .Values.app_name }}
   ports:

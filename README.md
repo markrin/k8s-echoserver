@@ -31,3 +31,8 @@ helm package ./helm --version "0.0.1"
 aws ecr get-login-password --profile <profile> --region eu-central-1 | helm registry login --username AWS --password-stdin <account_id>.dkr.ecr.eu-central-1.amazonaws.com
 helm push ./mark-pyecho-0.0.1.tgz oci://<account_id>.dkr.ecr.eu-central-1.amazonaws.com
 ```
+---
+
+access echoserver:
+`kubectl get ingress -o yaml | grep hostname`
+copy the address and access it using browser

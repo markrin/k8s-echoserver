@@ -6,22 +6,22 @@ metadata:
   name: ingress
   namespace: default
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-type: alb
-    kubernetes.io/ingress.class: alb
+    # service.beta.kubernetes.io/aws-load-balancer-type: alb
+    # kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/load-balancer-attributes: routing.http.drop_invalid_header_fields.enabled=false
+    # alb.ingress.kubernetes.io/security-groups: {{ .Values.ingress_sg }}
+    # alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket={{ .Values.env }}-{{ .Values.app_name }}-alb-access-log-bucket
+    # alb.ingress.kubernetes.io/load-balancer-attributes: routing.http.drop_invalid_header_fields.enabled=false
     # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "Name=Mark,Temp=True,Owner=Nati,Depatment=DevOps"
-    alb.ingress.kubernetes.io/actions.response-404: >
-      {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"404","messageBody":"default_route"}}
 spec:
   ingressClassName: alb
   rules:
   - http:
       paths:
       - path: /
-        pathType: Exact
+        pathType: Prefix
         backend:
           service:
             name: {{ .Values.pyecho_service_name }}

@@ -14,3 +14,7 @@ output "vpc_id" {
 # output "test" {
 #   value = data.kubernetes_service.ingress.metadata
 # }
+
+# output "test" {
+#   value = helm_release.pyecho.manifest
+# }
