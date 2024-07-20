@@ -1,4 +1,8 @@
 note*: eu-central-1 region is used. substitute any if needed. neme "pyecho" can be changed to any using terraform input variables
+note**: assumed you have docker, kubectl, helm, aws cli installed and configured
+
+Preparation:
+clone the repository and cd to it's root. You can also open the code in IDE.
 
 ## Docker image
 
@@ -12,6 +16,12 @@ docker run --name pyecho -d -p 5000:5000 pyecho:1 --env=internal
 
 Run terraform container with all installed dependencies and create infrastructure
 Helm deployment will fail because no chart and docker image pushed yet
+
+Optional preparations: create remote backend.
+Copy provider.tf file to other folder, comment marked part and set backend = "local"
+run tf init and tf apply. This should create s3 bucket and dynamodb table. 
+Comment backend and uncomment s3 backend configs. Run tf plan and expect no changes.
+
 ```
 docker build -t terraform -f ./tf/tf.Dockerfile ./tf
 # set desired region for infrastructure using AWS_DEFAULT_REGION
@@ -65,3 +75,8 @@ kubectl get all -n kube-system # alb controller and etc
 access echoserver:
 `kubectl get ingress -o yaml | grep hostname`
 copy the address and access it using browser
+
+
+## Extra: deploy using terragrunt
+
+see "terragrunt" branch
