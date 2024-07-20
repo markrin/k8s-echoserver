@@ -13,11 +13,14 @@ RUN wget -O- https://apt.releases.hashicorp.com/gpg | \
     https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
     tee /etc/apt/sources.list.d/hashicorp.list
 
+RUN apt update && apt-get install -y terraform
+
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&\
     unzip awscliv2.zip &&\
     ./aws/install
 
-RUN apt update && apt-get install -y terraform
+RUN wget -O terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/v0.63.2/terragrunt_linux_amd64 &&\
+    chmod +x terragrunt && mv terragrunt /usr/local/bin/terragrunt
 
 RUN echo "alias tf=terraform" >> ~/.bashrc &&\
     echo "export AWS_DEFAULT_REGION=eu-central-1" >> ~/.bashrc &&\

@@ -133,7 +133,7 @@ resource "aws_ecr_repository_policy" "attach_policy_1" {
 }
 
 resource "aws_iam_role" "eks_master_role" {
-  name = "eks-control-plane-role"
+  name = "eks-master-role"
 
   assume_role_policy = <<POLICY
 {
@@ -242,26 +242,6 @@ resource "kubernetes_service_account" "service-account" {
         }
     }
 }
-
-# resource "aws_s3_bucket" "alb-logs-bucket" {
-#   bucket = "${var.env}-${var.app_name}-alb-access-log-bucket"
-# }
-
-# resource "aws_iam_policy_attachment" "lb_role_s3_access" {
-#   name = "pa-1"
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-#   roles = [ module.lb_role.iam_role_name ]
-
-#   depends_on = [ module.lb_role ]
-# }
-
-# resource "aws_iam_policy_attachment" "eks_role_s3_access" {
-#   name = "pa-2"
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-#   roles = [ split("/", aws_eks_cluster.cluster.role_arn)[1] ]
-
-#   depends_on = [ aws_eks_cluster.cluster ]
-# }
 
 resource "helm_release" "alb-controller" {
     provider = helm

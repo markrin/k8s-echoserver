@@ -9,12 +9,12 @@ variable "env" {
 
 variable "cluster_name" {
   type = string
-  default = "mark-assignment"
+  default = "pyecho-cluster"
 }
 
 variable "app_name" {
   type = string
-  default = "mark-pyecho"
+  default = "pyecho"
 }
 
 variable "workers_instance_type" {
@@ -24,7 +24,7 @@ variable "workers_instance_type" {
 
 variable "helm_release_version" {
   type = string
-  default = "0.0.22"
+  default = "1.0.0"
 }
 
 locals {
@@ -34,7 +34,7 @@ locals {
         Department = "DevOps"
         Temp = "True"
     }
-    eks_workers_role_name = "eks_workers_role"
+    eks_workers_role_name = "eks_worker_role"
 }
 
 data "aws_availability_zones" "available" {
