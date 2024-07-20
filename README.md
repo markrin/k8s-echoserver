@@ -79,4 +79,9 @@ copy the address and access it using browser
 
 ## Extra: deploy using terragrunt
 
-see "terragrunt" branch
+cd to tf/terragrunt/envs/dev or create your folder inside envs/, copy terragrunt.hcl file, modify variables
+```
+terragrunt init
+terragrunt plan
+terragrunt apply
+```
