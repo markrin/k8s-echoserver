@@ -81,6 +81,7 @@ copy the address and access it using browser
 
 cd to tf/terragrunt/envs/dev or create your folder inside envs/, copy terragrunt.hcl file, modify variables
 ```
+git config --global --add safe.directory '*' # supress modules ownership errors
 terragrunt init
 terragrunt plan
 terragrunt apply
