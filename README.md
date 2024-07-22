@@ -27,13 +27,13 @@ docker build -t terraform -f ./tf/tf.Dockerfile ./tf
 # set desired region for infrastructure using AWS_DEFAULT_REGION
 docker run --name tf -d -v ./tf:/home/tf -e AWS_ACCESS_KEY_ID=x -e AWS_SECRET_ACCESS_KEY=y -e AWS_DEFAULT_REGION=eu-central-1 terraform
 docker exec -it tf bash
-> tf plan -var 'env=dev'
-> tf apply -var 'env=dev'
+> tf plan -var 'env=dev' -var 'app_name=...'
+> tf apply -var 'env=dev' -var 'app_name=...'
 
 ```
 Setup kubeconfig and check k8s connectivity
 1) to get/update kubeconfig:
-`aws eks --region eu-central-1 update-kubeconfig --name mark-assignment`
+`aws eks --region eu-central-1 update-kubeconfig --name <cluster_name>`
 2) check connectivity:
 `kubectl get ns`
 
@@ -49,10 +49,11 @@ docker push <account_id>.dkr.ecr.eu-central-1.amazonaws.com/mark-pyecho:1
 ```
 
 ## Package Helm chart
+First, change `name` in helm/Chart.yaml to one set in tf apply -var 'app_name=<name>'
 ```
 helm package ./helm --version "0.0.1"
 aws ecr get-login-password --profile <profile> --region eu-central-1 | helm registry login --username AWS --password-stdin <account_id>.dkr.ecr.eu-central-1.amazonaws.com
-helm push ./mark-pyecho-0.0.1.tgz oci://<account_id>.dkr.ecr.eu-central-1.amazonaws.com
+helm push ./<name>-0.0.1.tgz oci://<account_id>.dkr.ecr.eu-central-1.amazonaws.com
 ```
 ## Final setup
 

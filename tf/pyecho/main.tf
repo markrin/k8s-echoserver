@@ -176,7 +176,7 @@ resource "aws_eks_cluster" "cluster" {
       aws_subnet.public-az2.id
     ]
   }
-
+  tags = local.common_tags
   depends_on = [aws_iam_role_policy_attachment.policy-attachment-AmazonEKSClusterPolicy]
 }
 
@@ -201,85 +201,13 @@ module "eks_blueprints_addons" {
   oidc_provider_arn = aws_iam_openid_connect_provider.eks.arn
 
   enable_aws_load_balancer_controller    = true
+  aws_load_balancer_controller = {
+    values = [
+        "{ vpcId: ${aws_vpc.vpc.id} }"
+    ]
+  }
 }
 
-# https://medium.com/@StephenKanyiW/provision-eks-with-terraform-helm-and-a-load-balancer-controller-821dacb35066
-# module "lb_role" {
-#  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-
-#  role_name                              = "${var.cluster_name}_eks_lb"
-#  attach_load_balancer_controller_policy = true
-
-#  oidc_providers = {
-#      main = {
-#      provider_arn               = aws_iam_openid_connect_provider.eks.arn
-#      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
-#      }
-#  }
-# }
-
-# provider "kubernetes" {
-#     host                   = aws_eks_cluster.cluster.endpoint
-#     cluster_ca_certificate = base64decode(aws_eks_cluster.cluster.certificate_authority[0].data)
-#     # token = data.aws_eks_cluster_auth.this.token
-#     exec {
-#         api_version = "client.authentication.k8s.io/v1beta1"
-#         args        = ["eks", "get-token", "--cluster-name", aws_eks_cluster.cluster.id]
-#         command     = "aws"
-#     }
-# }
-
-# resource "kubernetes_service_account" "service-account" {
-#     provider = kubernetes
-#     metadata {
-#         name      = "aws-load-balancer-controller"
-#         namespace = "kube-system"
-#         labels = {
-#         "app.kubernetes.io/name"      = "aws-load-balancer-controller"
-#         "app.kubernetes.io/component" = "controller"
-#         }
-#         annotations = {
-#         "eks.amazonaws.com/role-arn"               = module.lb_role.iam_role_arn
-#         "eks.amazonaws.com/sts-regional-endpoints" = "true"
-#         }
-#     }
-# }
-
-# resource "helm_release" "alb-controller" {
-#     provider = helm
-#     name       = "aws-load-balancer-controller"
-#     repository = "https://aws.github.io/eks-charts"
-#     chart      = "aws-load-balancer-controller"
-#     namespace  = "kube-system"
-#     depends_on = [
-#         kubernetes_service_account.service-account
-#     ]
-
-#     set {
-#         name  = "region"
-#         value = data.aws_region.current.id
-#     }
-#     set {
-#         name  = "vpcId"
-#         value = aws_vpc.vpc.id
-#     }
-#     set {
-#         name  = "image.repository"
-#         value = "public.ecr.aws/eks/aws-load-balancer-controller"
-#     }
-#     set {
-#         name  = "serviceAccount.create"
-#         value = "false"
-#     }
-#     set {
-#         name  = "serviceAccount.name"
-#         value = "aws-load-balancer-controller"
-#     }
-#     set {
-#         name  = "clusterName"
-#         value = var.cluster_name
-#     }
-# }
 
 resource "aws_iam_role" "workers-role" {
   name = local.eks_workers_role_name
@@ -344,14 +272,6 @@ resource "aws_eks_node_group" "private-nodes" {
   ]
 }
 
-# resource "aws_security_group_rule" "internet-to-alb" {
-#   security_group_id = aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
-#   from_port = 80
-#   to_port = 80
-#   protocol = "tcp"
-#   type = "ingress"
-#   cidr_blocks = [ "0.0.0.0/0" ]
-# }
 
 data "aws_eks_cluster_auth" "this" {
   name = aws_eks_cluster.cluster.id
@@ -383,7 +303,7 @@ resource "helm_release" "pyecho" {
   name = "pyecho"
 
   repository = "oci://${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.id}.amazonaws.com"
-  chart      = "mark-pyecho"
+  chart      = var.app_name
   namespace  = "default"
   version    = var.helm_release_version
 

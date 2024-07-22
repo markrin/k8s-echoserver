@@ -8,5 +8,7 @@ terraform {
 
 inputs = {
     env = "internal"
-    helm_release_version = "0.0.22"
+    app_name = "pyecho-int"
+    helm_release_version = "1.0.0"
+    cluster_name = "pyecho-cluster-int"
 }
