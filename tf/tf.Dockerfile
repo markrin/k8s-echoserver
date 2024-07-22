@@ -24,6 +24,7 @@ RUN wget -O terragrunt https://github.com/gruntwork-io/terragrunt/releases/downl
 
 RUN echo "alias tf=terraform" >> ~/.bashrc &&\
     echo "export AWS_DEFAULT_REGION=eu-central-1" >> ~/.bashrc &&\
+    echo "complete -C '/usr/local/bin/aws_completer' aws" >> ~/.bashrc &&\
     . ~/.bashrc
 
 WORKDIR /home/tf
